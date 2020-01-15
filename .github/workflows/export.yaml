@@ -1,0 +1,29 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - master
+
+# docker history hello-world:latest --no-trunc --format '{{.CreatedBy}}' | tail -r
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: generate new file
+        run: |
+          docker pull hello-world:latest
+          CID=$(docker run -d hello-world:latest)
+          docker export $CID | tar -xv
+      - uses: stefanzweifel/git-auto-commit-action@v2.5.0
+        with:
+          commit_message: Commit and push changes
+          branch: master
+          file_pattern: "*"
+          repository: .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
