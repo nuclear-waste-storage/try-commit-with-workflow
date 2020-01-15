@@ -19,6 +19,7 @@ jobs:
           docker pull hello-world:latest
           CID=$(docker run -d hello-world:latest)
           docker export $CID | tar -xv
+          find . -type d | xargs -I {} sh -c 'du -s {} | awk -F"\t" "{ print \$1 }" | test "$(cat /dev/stdin)" = "0" && echo {}'
           find . -type d | xargs -I {} sh -c 'du -s {} | awk -F"\t" "{ print \$1 }" | test "$(cat /dev/stdin)" = "0" && echo {}' | xargs -I {} sh -c 'echo "!.gitignore" > {}/.gitignore'
       - uses: stefanzweifel/git-auto-commit-action@v2.5.0
         with:
